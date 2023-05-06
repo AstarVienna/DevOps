@@ -1,0 +1,22 @@
+[project]
+name = "astarsample"
+version = "0.4-alpha"
+description = "Example project"
+readme = "README.md"
+requires-python = ">=3.8"
+# When updating the version, also update the versions in .github/workflows/*
+license = {text = "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"}
+dependencies = [
+    # Try to keep the dependencies on lower versions that have a wheel
+    # package on PyPI, for minimumdependencies.yml
+    "numpy>=1.18.0",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=5.0.0",
+    "pytest-cov",
+]
+
+[tool.setuptools]
+packages = ["sample"]
