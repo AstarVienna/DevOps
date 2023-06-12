@@ -32,7 +32,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install git+https://github.com/AstarVienna/ScopeSim_Data.git
-          pip install .[test]
+          # Install this clone of the project. This is relevant because for
+          # example ScopeSim has ScopeSim_Templates as a test-dependency
+          # and that package has ScopeSim as a dependency. So the PyPI version
+          # of ScopeSim would be installed without the "pip install ." line.
+          pip install .
+          # TODO: It should not be necessary to install the dev dependencies.
+          #       Perhaps create a separate test for that?
+          pip install .[test,dev]
           pip install pytest pytest-cov
       - name: Run Pytest
         run: pytest --cov
