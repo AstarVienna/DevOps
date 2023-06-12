@@ -39,7 +39,7 @@ jobs:
           pip install .
           # TODO: It should not be necessary to install the dev dependencies.
           #       Perhaps create a separate test for that?
-          pip install .[test, dev]
+          pip install .[test,dev]
           pip install pytest pytest-cov
       - name: Run Pytest
         run: pytest --cov
