@@ -22,7 +22,7 @@ on:
     - cron: "0 5 * * *"
 
 jobs:
-  build:
+  test-minimum-dependencies:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
