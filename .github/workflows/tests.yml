@@ -14,7 +14,7 @@ on:
   workflow_call:
 
 jobs:
-  build:
+  tests-without-network:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -40,8 +40,24 @@ jobs:
           # TODO: It should not be necessary to install the dev dependencies.
           #       Perhaps create a separate test for that?
           pip install .[test,dev]
+          pip install pytest
+      - name: Run Pytest without web tests
+        run: pytest -m "not webtest"
+
+  tests-with-network:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install git+https://github.com/AstarVienna/ScopeSim_Data.git
+          pip install .
+          pip install .[test,dev]
           pip install pytest pytest-cov
-      - name: Run Pytest
+      - name: Run Pytest with coverage
         run: pytest --cov
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
