@@ -34,7 +34,7 @@ jobs:
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
         with:
-          poetry-version: "1.7.0"
+          poetry-version: "1.7.1"
 
       - name: Install dependencies
         run: |
@@ -42,7 +42,7 @@ jobs:
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
 
       - name: Run Pytest
-        run: poetry run pytest --cov
+        run: echo "$(poetry run pytest --cov)" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
