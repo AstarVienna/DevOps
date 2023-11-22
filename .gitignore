@@ -2,3 +2,11 @@ __pycache__
 .idea
 *.egg-info
 build
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+
+# Pylint
+.pylint.d/
