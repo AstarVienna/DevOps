@@ -21,3 +21,5 @@ These quotes highlight the goal and status of this repository.
 
 This link is valid, but cannot be validated with markdown-link-checker, but
 can be validated with linkspector: https://doi.org/10.1117/12.2559784
+
+A broken link: https://hello.doesnotexistreallydoesnot.not
