@@ -17,8 +17,11 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get install npm
+        # See https://github.com/UmbrellaDocs/linkspector
         npm install -g @umbrelladocs/linkspector
     - name: Check links
       run: |
-        printf "dirs:\n  - ./\n" > .linkspector.yml
+        # Generate default configuration file if it doesn't exist.
+        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\n" > .linkspector.yml ; fi
+        # Run the check.
         linkspector check
