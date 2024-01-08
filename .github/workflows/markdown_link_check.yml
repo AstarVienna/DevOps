@@ -14,4 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
-    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+    - name: Install dependencies
+      run: |
+        apt-get install npm
+        npm install -g @umbrelladocs/linkspector
+    - name: Check links
+      run: |
+        printf "dirs:\n  - ./\n" > .linkspector.yml
+        linkspector check
