@@ -1,4 +1,5 @@
 name: Check Markdown links
+# See https://github.com/UmbrellaDocs/linkspector
 
 on:
   push:
@@ -23,11 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
+    - uses: actions/setup-node@v4
     - name: Install dependencies
-      run: |
-        apt-get install npm
-        # See https://github.com/UmbrellaDocs/linkspector
-        npm install -g @umbrelladocs/linkspector
+      run: npm install -g @umbrelladocs/linkspector
     - name: Check links
       run: |
         # Generate default configuration file if it doesn't exist.
