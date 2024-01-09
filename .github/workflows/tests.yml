@@ -40,23 +40,11 @@ jobs:
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
-          poetry add pytest-md-report
 
       - name: Run Pytest
-        env:
-          PYTEST_MD_REPORT_OUTPUT: md_report.md
-          PYTEST_MD_REPORT_FLAVOR: gfm
-        run: poetry run pytest --cov --cov-report=xml --md-report
+        run: poetry run pytest --cov --cov-report=xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Render reports to the PR when tests fail
-        if: failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.number }}
-        run:
-          gh pr comment $PR_NUMBER --body-file md_report.md
