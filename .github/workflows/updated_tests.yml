@@ -1,0 +1,48 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allow this workflow to be called from other repositories.
+  workflow_call:
+
+jobs:
+  run-tests:
+    name: Run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ['3.9', '3.12']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.7.1"
+
+      - name: Install dependencies
+        run: |
+          poetry install --with test --all-extras
+          poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
+
+      - name: Update dependencies
+        run: poetry update >> $GITHUB_STEP_SUMMARY
+
+      - name: Run Pytest
+        run: poetry run pytest -m "webtest" --cov --cov-report=xml
