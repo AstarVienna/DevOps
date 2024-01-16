@@ -4,6 +4,7 @@ version = "0.4-alpha"
 description = "Example project"
 readme = "README.md"
 license = "GPL-3.0-or-later"
+authors = ["Hugo Buddelmeijer <hugo@buddelmeijer.nl>"]
 
 [tool.poetry.dependencies]
 # When updating the version, also update the versions in .github/workflows/*
