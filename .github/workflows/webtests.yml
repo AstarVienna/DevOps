@@ -17,7 +17,7 @@ jobs:
   run-tests:
     # The web tests are run with a limited matrix, because they retrieve data
     #  from the internet and therefor run into rate limits with the full matrix.
-    name: Run tests
+    name: ubuntu-latest, ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
