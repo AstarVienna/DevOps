@@ -1,22 +1,19 @@
-[project]
+[tool.poetry]
 name = "astarsample"
 version = "0.4-alpha"
 description = "Example project"
 readme = "README.md"
-requires-python = ">=3.8"
+license = "GPL-3.0-or-later"
+
+[tool.poetry.dependencies]
 # When updating the version, also update the versions in .github/workflows/*
-license = {text = "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"}
-dependencies = [
-    # Try to keep the dependencies on lower versions that have a wheel
-    # package on PyPI, for minimumdependencies.yml
-    "numpy>=1.18.0",
-]
+python = "^3.8"
+numpy = "^1.18.0"
 
-[project.optional-dependencies]
-test = [
-    "pytest>=5.0.0",
-    "pytest-cov",
-]
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.3"
+pytest-cov = "^4.1.0"
 
-[tool.setuptools]
-packages = ["sample"]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
