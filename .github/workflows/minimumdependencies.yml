@@ -36,7 +36,7 @@ jobs:
         with:
           # Keep python-version on the lowest version from pyproject.toml.
           # Also update the regexp below.
-          python-version: 3.8
+          python-version: 3.9
       - name: Install dependencies
         run: |
           # Hardcode the minimum version of the dependencies.
