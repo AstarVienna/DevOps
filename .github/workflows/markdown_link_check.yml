@@ -1,4 +1,5 @@
 name: Check Markdown links
+# See https://github.com/UmbrellaDocs/linkspector
 
 on:
   push:
@@ -13,5 +14,15 @@ jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Install dependencies
+      run: npm install -g @umbrelladocs/linkspector
+    - name: Check links
+      run: |
+        # Generate default configuration file if it doesn't exist.
+        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\n" > .linkspector.yml ; fi
+        # Run the check.
+        linkspector check
