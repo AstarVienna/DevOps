@@ -55,6 +55,10 @@ jobs:
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
 
+      - name: Run Pytest with Poetry
+        if: inputs.poetry
+        run: poetry run pytest -m "not webtest" --cov --cov-report=xml
+
       - name: Install dependencies without Poetry
         if: ${{ ! inputs.poetry }}
         run: |
@@ -70,10 +74,9 @@ jobs:
           pip install .[test,dev]
           pip install pytest pytest-cov
 
-      - name: Run Pytest
-        env:
-          PTRY: ${{ inputs.poetry && 'poetry run' || '' }}
-        run: $PTRY pytest -m "not webtest" --cov --cov-report=xml
+      - name: Run Pytest without Poetry
+        if: ${{ ! inputs.poetry }}
+        run: pytest -m "not webtest" --cov --cov-report=xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
