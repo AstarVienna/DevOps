@@ -31,6 +31,15 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Read peoperty
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            /repos/AstarVienna/DevOps/properties/values
+
       - name: Set up Poetry
         uses: abatilo/actions-poetry@v2
         with:
