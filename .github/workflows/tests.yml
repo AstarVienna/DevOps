@@ -11,9 +11,19 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      poetry:
+        type: boolean
+        description: "Use Poetry-based workflow."
+        required: false
 
   # Allow this workflow to be called from other repositories.
   workflow_call:
+    inputs:
+      poetry:
+        type: boolean
+        description: "Use Poetry-based workflow."
+        required: false
 
 jobs:
   run-tests:
