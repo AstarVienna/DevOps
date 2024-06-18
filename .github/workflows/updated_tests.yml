@@ -15,6 +15,8 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
 
+# This workflow need Poetry, so no flag is included.
+
 jobs:
   run-tests:
     name: ${{ matrix.os }}, ${{ matrix.python-version }}
