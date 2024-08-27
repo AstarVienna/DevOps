@@ -18,6 +18,7 @@ on:
         type: boolean
         description: "Use Poetry-based workflow."
         required: false
+        default: true
 
   # Allow this workflow to be called from other repositories.
   workflow_call:
@@ -26,6 +27,7 @@ on:
         type: boolean
         description: "Use Poetry-based workflow."
         required: false
+        default: true
 
 jobs:
   run-tests:
@@ -46,23 +48,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Set up Poetry
-        if: ${{ inputs.poetry || github.event_name == 'push' || github.event_name == 'pull_request' }}
+        if: ${{ inputs.poetry }}
         uses: abatilo/actions-poetry@v3
         with:
           poetry-version: "1.8.3"
 
       - name: Install dependencies with Poetry
-        if: ${{ inputs.poetry || github.event_name == 'push' || github.event_name == 'pull_request' }}
+        if: ${{ inputs.poetry }}
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
 
       - name: Run Pytest with Poetry
-        if: ${{ inputs.poetry || github.event_name == 'push' || github.event_name == 'pull_request' }}
+        if: ${{ inputs.poetry }}
         run: poetry run pytest -m "not webtest" --cov --cov-report=xml
 
       - name: Install dependencies without Poetry
-        if: ${{ ! inputs.poetry && github.event_name != 'push' && github.event_name != 'pull_request' }}
+        if: ${{ ! inputs.poetry }}
         run: |
           python -m pip install --upgrade pip
           pip install git+https://github.com/AstarVienna/ScopeSim_Data.git
@@ -77,7 +79,7 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run Pytest without Poetry
-        if: ${{ ! inputs.poetry && github.event_name != 'push' && github.event_name != 'pull_request' }}
+        if: ${{ ! inputs.poetry }}
         run: pytest -m "not webtest" --cov --cov-report=xml
 
       - name: Upload coverage reports to Codecov
