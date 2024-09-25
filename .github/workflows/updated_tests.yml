@@ -39,12 +39,15 @@ jobs:
           poetry-version: "1.8.3"
 
       - name: Install dependencies
+        shell: bash
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
 
       - name: Update dependencies
-        run: poetry update >> $GITHUB_STEP_SUMMARY
+        shell: bash
+        run: poetry update | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Run Pytest
+        shell: bash
         run: poetry run pytest -m "not webtest" --cov --cov-report=xml
