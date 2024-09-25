@@ -44,7 +44,7 @@ jobs:
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
 
       - name: Update dependencies
-        run: poetry update >> $GITHUB_STEP_SUMMARY
+        run: poetry update | tee -a $GITHUB_STEP_SUMMARY
 
       - name: Run Pytest
         run: poetry run pytest -m "not webtest" --cov --cov-report=xml
