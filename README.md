@@ -7,11 +7,7 @@ This repository contains github action workflows that can be reused by the other
 
 ## Quotes
 
-These quotes highlight the goal and status of this repository.
-
-[kachnuv_ocasek](https://news.ycombinator.com/item?id=36354589)
-
->  no amount of money can compensate for the soul-sucking pain of being a YAML engineer.
+This quote highlights the goal of this repository:
 
 [arghwhat](https://news.ycombinator.com/item?id=36354464)
 
