@@ -1,0 +1,41 @@
+name: Test Docstrings
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allow this workflow to be called from other repositories.
+  workflow_call:
+
+# This workflow need Poetry, so no flag is included.
+
+jobs:
+  test-docstrings:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: "1.8.3"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          poetry install --with test --all-extras
+          poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
+
+      - name: Run Pytest
+        shell: bash
+        run: poetry run pytest --doctest-modules --cov --cov-report=xml
