@@ -38,4 +38,4 @@ jobs:
 
       - name: Run Pytest
         shell: bash
-        run: poetry run pytest --doctest-modules --cov --cov-report=xml
+        run: poetry run pytest -m "not webtest and not slow" --doctest-modules --cov --cov-report=xml
