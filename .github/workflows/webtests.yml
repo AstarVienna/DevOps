@@ -37,7 +37,7 @@ jobs:
 
       - name: Set up Poetry
         if: inputs.poetry
-        uses: abatilo/actions-poetry@v3
+        uses: abatilo/actions-poetry@v4
         with:
           poetry-version: "1.8.3"
 
