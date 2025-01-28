@@ -24,6 +24,6 @@ jobs:
     - name: Check links
       run: |
         # Generate default configuration file if it doesn't exist.
-        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\n" > .linkspector.yml ; fi
+        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\nignorePatterns:\n  - pattern: '^https://www.gnu.org/licenses.*$'\n" > .linkspector.yml ; fi
         # Run the check.
         linkspector check
