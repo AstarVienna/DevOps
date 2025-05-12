@@ -12,7 +12,7 @@ on:
 
 jobs:
   markdown-link-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: github.event.pull_request.labels[0].name != 'no release notes'
     steps:
     - uses: actions/checkout@v4
@@ -24,6 +24,6 @@ jobs:
     - name: Check links
       run: |
         # Generate default configuration file if it doesn't exist.
-        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\n" > .linkspector.yml ; fi
+        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\nignorePatterns:\n  - pattern: '^https://www.gnu.org/licenses.*$'\n" > .linkspector.yml ; fi
         # Run the check.
         linkspector check
