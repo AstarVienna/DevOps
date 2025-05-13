@@ -52,3 +52,17 @@ jobs:
       - name: Run Pytest
         shell: bash
         run: poetry run pytest -m "not webtest" --cov --cov-report=xml
+
+  debug-1:
+    name: Offline tests with poetry
+    uses: ./.github/workflows/tests.yml
+    with:
+      poetry: True
+    secrets: inherit
+
+  debug-2:
+    name: Offline tests without poetry
+    uses: ./.github/workflows/tests.yml
+    with:
+      poetry: False
+    secrets: inherit
