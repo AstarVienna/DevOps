@@ -39,7 +39,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: debug
-        run: echo "${{ inputs.poetry }}"
+        run: |
+          echo "${{ inputs.poetry }}"
+          echo "${{ inputs.poetry != 'true' }}"
+          echo "${{ inputs.poetry == 'true' }}"
+          echo "${{ inputs.poetry != true }}"
+          echo "${{ inputs.poetry == true }}"
+          echo "${{ inputs.poetry != 'false' }}"
+          echo "${{ inputs.poetry == 'false' }}"
+          echo "${{ inputs.poetry != false }}"
+          echo "${{ inputs.poetry == false }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
