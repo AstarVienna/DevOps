@@ -41,14 +41,12 @@ jobs:
       - name: debug
         run: |
           echo "${{ inputs.poetry }}"
-          echo "${{ inputs.poetry != 'true' }}"
-          echo "${{ inputs.poetry == 'true' }}"
           echo "${{ inputs.poetry != true }}"
           echo "${{ inputs.poetry == true }}"
-          echo "${{ inputs.poetry != 'false' }}"
-          echo "${{ inputs.poetry == 'false' }}"
           echo "${{ inputs.poetry != false }}"
           echo "${{ inputs.poetry == false }}"
+          echo "${{ inputs.poetry == '' }}"
+          echo "${{ inputs.poetry == true || inputs.poetry == '' }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
