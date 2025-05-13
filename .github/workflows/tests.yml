@@ -38,6 +38,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: debug
+        run: echo "${{ inputs.poetry }}"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
