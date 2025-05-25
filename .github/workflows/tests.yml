@@ -24,11 +24,11 @@ on:
         description: "Use Poetry-based workflow."
         required: false
         default: true
-      external:
-        type: boolean
+      trigger:
+        type: string
         description: "Fake input parameter to tell if triggered from outside. Do not set manually."
         required: false
-        default: true
+        default: "external"
 
 jobs:
   run-tests:
@@ -45,9 +45,8 @@ jobs:
 
       - name: debug
         run: |
-          echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push'))}}"
-          echo "${{ (inputs.poetry == true) && (inputs.external == true) }}"
-          echo "${{ (inputs.poetry == true) && (github.event_name == 'workflow_dispatch') }}"
+          echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push')) && (inputs.trigger != 'external') }}"
+          echo "${{ (inputs.poetry == true) && ((github.event_name == 'workflow_dispatch') || (inputs.trigger == 'external')) }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
