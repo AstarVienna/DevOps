@@ -49,7 +49,7 @@ jobs:
           echo "${{ github.event_name == 'pull_request' }}"
           echo "${{ github.event_name == 'push' }}"
           echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push')) || (inputs.poetry == true) }}"
-          echo "${{ inputs.poetry && inputs.external }}"
+          echo "${{ (inputs.poetry == true) && (inputs.external == true) }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
