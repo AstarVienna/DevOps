@@ -45,11 +45,9 @@ jobs:
 
       - name: debug
         run: |
-          echo "${{ inputs.poetry == true }}"
-          echo "${{ github.event_name == 'pull_request' }}"
-          echo "${{ github.event_name == 'push' }}"
-          echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push')) || (inputs.poetry == true) }}"
+          echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push'))}}"
           echo "${{ (inputs.poetry == true) && (inputs.external == true) }}"
+          echo "${{ (inputs.poetry == true) && (github.event_name == 'workflow_dispatch') }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
