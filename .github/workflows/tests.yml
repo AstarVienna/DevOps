@@ -40,16 +40,10 @@ jobs:
 
       - name: debug
         run: |
-          echo "${{ inputs.poetry }}"
-          echo "${{ inputs.poetry != true }}"
           echo "${{ inputs.poetry == true }}"
-          echo "${{ inputs.poetry != false }}"
-          echo "${{ inputs.poetry == false }}"
-          echo "${{ inputs.poetry == '' }}"
-          echo "${{ inputs.poetry == true || inputs.poetry == '' }}"
           echo "${{ github.event_name == 'pull_request' }}"
           echo "${{ github.event_name == 'push' }}"
-          echo "${{ (github.event_name == 'pull_request') || (github.event_name == 'push') }}"
+          echo "${{ ((github.event_name == 'pull_request') || (github.event_name == 'push')) || (inputs.poetry == true) }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
