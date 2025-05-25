@@ -47,6 +47,7 @@ jobs:
           echo "${{ inputs.poetry == false }}"
           echo "${{ inputs.poetry == '' }}"
           echo "${{ inputs.poetry == true || inputs.poetry == '' }}"
+          echo "${{ github.event_name }}"
 
       - name: Set up Python
         uses: actions/setup-python@v5
