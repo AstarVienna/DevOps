@@ -1,4 +1,4 @@
-name: Tests
+name: Updated Tests
 on:
   push:
     branches:
@@ -13,7 +13,7 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
 
-# This workflow need Poetry, so no flag is included.
+# This workflow needs Poetry, so no flag is included.
 
 jobs:
   run-tests:
