@@ -1,0 +1,138 @@
+name: Replace version placeholders
+on:
+  workflow_dispatch:
+    inputs:
+      pkg-path:
+        type: string
+        description: Package path where to look for placeholders
+        required: true
+      file-pattern:
+        type: string
+        description: Glob pattern for files to find
+        required: false
+        default: "*.py"
+
+  workflow_call:
+    inputs:
+      branch:
+        type: string
+        description: Branch (ref) to checkout and push changes to
+        required: false
+        default: ${{ github.ref_name }}
+      pkg-path:
+        type: string
+        description: Package path where to look for placeholders
+        required: true
+      file-pattern:
+        type: string
+        description: Glob pattern for files to find
+        required: false
+        default: "*.py"
+    outputs:
+      curver:
+        description: Current version.
+        value: ${{ jobs.replace.outputs.curver }}
+      stable:
+        description: Next stable version.
+        value: ${{ jobs.replace.outputs.stable }}
+
+jobs:
+  replace:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      curver: ${{ steps.bobr.outputs.CUR_VER }}
+      stable: ${{ steps.bobr.outputs.STABLE }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Poetry
+        uses: abatilo/actions-poetry@v3.0.2
+        with:
+          poetry-version: "2.1.2"
+
+      - name: Replace placeholders
+        id: bobr
+        env:
+          PLCHLDR: "PLACEHOLDER_NEXT_RELEASE_VERSION"
+          PKGPATH: ${{ inputs.pkg-path }}
+          PATTERN: ${{ inputs.file-pattern }}
+        shell: python
+        run: |
+          import os, sys, subprocess
+          from packaging.version import Version
+
+          # Get version from poetry
+          version = Version(subprocess.run(
+              "poetry version -s",
+              shell=True,
+              check=True,
+              text=True,
+              capture_output=True,
+          ).stdout)
+
+          # Check if we're on an rc version, fail if not
+          if not version.is_prerelease or version.pre[0] != "rc":
+              sys.exit(f"::error:: {version!s} is not a rc version")
+
+          # Write stable version to step summary
+          with open(os.environ.get("GITHUB_STEP_SUMMARY"), "a") as step_summary:
+              step_summary.write(f"On rc version of {version.base_version!s}\n")
+
+          # Write to output so version numbers are available upstream if needed
+          with open(os.environ.get("GITHUB_OUTPUT"), "a") as output:
+              output.write(f"CUR_VER={version!s}\n")
+              output.write(f"STABLE={version.base_version!s}\n")
+
+          # Get replacement parameters from ENV
+          placeholder = os.environ.get("PLCHLDR")
+          package_path = os.environ.get("PKGPATH")
+          pattern = os.environ.get("PATTERN")
+
+          # Write replacement parameters to step summary
+          with open(os.environ.get("GITHUB_STEP_SUMMARY"), "a") as step_summary:
+              step_summary.write(
+                  f"Replacing {placeholder} in {pattern} files inside "
+                  f"{package_path}\n"
+              )
+
+          # Run actual replace command
+          subprocess.run(
+              (f'find {package_path} -type f -name "{pattern}" -exec sed -i '
+               f'"s/{placeholder}/{version.base_version!s}/g" {{}} +'),
+              shell=True,
+              check=True,
+              text=True,
+          )
+
+      - name: Check for changes
+        id: chkdiff
+        run: |
+          set +e
+          (git diff --exit-code --quiet)
+          echo "CHANGES=$?" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: ${{ steps.chkdiff.outputs.CHANGES != 0 }}
+        env:
+          STABLE: ${{ steps.bobr.outputs.STABLE }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Replaced next version placeholders with $STABLE"
+          git push
+          echo "Successfully committed and pushed placeholder replacement." >> $GITHUB_STEP_SUMMARY
+
+      - name: No replacements
+        if: ${{ steps.chkdiff.outputs.CHANGES == 0 }}
+        run: echo "Nothing was replaced." >> $GITHUB_STEP_SUMMARY
