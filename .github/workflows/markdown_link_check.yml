@@ -4,7 +4,7 @@ name: Check Markdown links
 on:
   push:
   schedule:
-    - # Run every day at 5:00 UTC
+    # Run every day at 5:00 UTC
     - cron: "0 5 * * *"
 
   # Allow this workflow to be called from other repositories.
