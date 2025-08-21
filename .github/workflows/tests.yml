@@ -56,9 +56,11 @@ jobs:
 
       - name: Set up Poetry
         if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: "2.1.4"
+        shell: bash
+        run: |
+          python3 -m pip install --user pipx
+          python3 -m pipx ensurepath
+          pipx install poetry==2.1.4
 
       - name: Install dependencies with Poetry
         if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
