@@ -50,6 +50,7 @@ jobs:
         run: echo "USE_POETRY=$USE_POETRY" >> "$GITHUB_OUTPUT"
 
       - name: Install poetry
+        if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
         shell: bash
         run: pipx install poetry==2.1.4
 
