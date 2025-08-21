@@ -28,15 +28,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install poetry
+        shell: bash
+        run: pipx install poetry==2.1.4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Set up Poetry
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: "2.1.4"
 
       - name: Install dependencies
         shell: bash
@@ -44,6 +43,9 @@ jobs:
           poetry lock
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
+
+      - name: Check Python version
+        run: poetry run python -V >> "$GITHUB_STEP_SUMMARY"
 
       - name: Update dependencies
         shell: bash
