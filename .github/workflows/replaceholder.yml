@@ -57,9 +57,9 @@ jobs:
           python-version: "3.11"
 
       - name: Set up Poetry
-        uses: abatilo/actions-poetry@v3.0.2
+        uses: abatilo/actions-poetry@v3
         with:
-          poetry-version: "2.1.2"
+          poetry-version: "2.1.4"
 
       - name: Replace placeholders
         id: bobr
