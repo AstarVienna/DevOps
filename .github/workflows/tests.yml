@@ -49,22 +49,25 @@ jobs:
           USE_POETRY: "${{ (((github.event_name == 'pull_request') || (github.event_name == 'push')) && (inputs.trigger != 'external')) || ((inputs.poetry == true) && ((github.event_name == 'workflow_dispatch') || (inputs.trigger == 'external'))) }}"
         run: echo "USE_POETRY=$USE_POETRY" >> "$GITHUB_OUTPUT"
 
+      - name: Install poetry
+        if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
+        shell: bash
+        run: pipx install poetry==2.1.4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Set up Poetry
-        if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: "2.1.4"
 
       - name: Install dependencies with Poetry
         if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
+
+      - name: Check Python version
+        if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
+        run: poetry run python -V >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run Pytest with Poetry
         if: ${{ steps.decide.outputs.USE_POETRY == 'true' }}
