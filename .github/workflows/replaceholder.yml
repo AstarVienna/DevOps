@@ -51,15 +51,14 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
+      - name: Install poetry
+        shell: bash
+        run: pipx install poetry==2.1.4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: Set up Poetry
-        uses: abatilo/actions-poetry@v3
-        with:
-          poetry-version: "2.1.4"
 
       - name: Replace placeholders
         id: bobr
