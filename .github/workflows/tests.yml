@@ -39,7 +39,7 @@ jobs:
 
       - name: Install poetry
         shell: bash
-        run: pipx install poetry==2.1.4 "${{ env.pythonLocation }}/python"
+        run: pipx install poetry==2.1.4 --python "${{ env.pythonLocation }}/python"
 
       - name: Install dependencies with Poetry
         run: |
