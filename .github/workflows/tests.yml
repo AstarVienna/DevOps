@@ -45,6 +45,7 @@ jobs:
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
+          poetry env use "$(python -c 'import sys; print(sys.executable)')"
 
       - name: Check Python version
         run: poetry run python -V >> "$GITHUB_STEP_SUMMARY"
