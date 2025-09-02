@@ -44,7 +44,7 @@ jobs:
   Publish:
     name: Publish package to PyPI
     runs-on: ubuntu-latest
-    needs: build
+    needs: Build
     if: needs.build.result == 'success'
     steps:
       - name: Checkout code
@@ -83,7 +83,7 @@ jobs:
 
   Bump:
     name: Bump to (next) dev version
-    needs: publish
+    needs: Publish
     if: ${{ needs.publish.result == 'success' }}
     uses: ./.github/workflows/bump.yml
     secrets: inherit
