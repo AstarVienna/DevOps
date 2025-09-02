@@ -42,6 +42,7 @@ on:
 
 jobs:
   bump:
+    name: Bump package version
     runs-on: ubuntu-latest
     permissions:
       contents: write
