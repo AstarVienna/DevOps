@@ -123,8 +123,8 @@ jobs:
         env:
           BUMP_MSG: ${{ steps.bumping.outputs.BUMP_MSG }}
         run: |
-          git config user.name "AstarVienna Bot"
-          git config user.email "astar.astro@univie.ac.at"
+          git config user.name "astarvienna-bot[bot]"
+          git config user.email "217837468+myciapp[bot]@users.noreply.github.com"
           git commit -am "$BUMP_MSG"
           git push
           echo "## $BUMP_MSG" >> $GITHUB_STEP_SUMMARY
