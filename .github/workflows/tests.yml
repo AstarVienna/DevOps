@@ -54,7 +54,6 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies with Poetry
-        continue-on-error: ${{ matrix.experimental }}
         run: |
           poetry install --with test --all-extras
           poetry add git+https://github.com/AstarVienna/ScopeSim_Data.git
@@ -64,7 +63,6 @@ jobs:
         run: poetry run python -V >> "$GITHUB_STEP_SUMMARY"
 
       - name: Run Pytest with Poetry
-        continue-on-error: ${{ matrix.experimental }}
         run: poetry run pytest -m "not webtest" --cov --cov-report=xml
 
       - name: Upload coverage reports to Codecov
