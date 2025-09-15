@@ -23,7 +23,7 @@ jobs:
   run-tests:
     name: ${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.python.experimental }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
