@@ -11,7 +11,7 @@ packages = [{include = "sample"}]
 [tool.poetry.dependencies]
 # When updating the version, also update the versions in .github/workflows/*
 # and also re-run "poetry lock --no-update" and commit the changed lock file
-python = ">=3.10, <3.14"
+python = ">=3.11, <3.14"
 numpy = ">=2.1.0,<2.3.0"
 
 [tool.poetry.group.test.dependencies]

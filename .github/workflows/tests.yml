@@ -32,13 +32,13 @@ jobs:
         experimental: [false]
         include:
           - os: ubuntu-latest
-            python-version: '3.13'
+            python-version: '3.14'
             experimental: true
           - os: macos-latest
-            python-version: '3.13'
+            python-version: '3.14'
             experimental: true
           - os: windows-latest
-            python-version: '3.13'
+            python-version: '3.14'
             experimental: true
 
     steps:
