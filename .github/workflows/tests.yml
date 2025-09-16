@@ -21,7 +21,7 @@ on:
 
 jobs:
   run-tests:
-    name: ${{ matrix.experimental && '⚠️ Experimental: ' || '' }}${{ matrix.os }}, ${{ matrix.python-version }}
+    name: ${{ matrix.experimental && '⚠️ ' || '' }}${{ matrix.os }}, ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
