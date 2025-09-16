@@ -2,7 +2,7 @@ name: Check Markdown links
 # See https://github.com/UmbrellaDocs/linkspector
 
 on:
-  push:
+  # push:
   schedule:
     # Run every day at 5:00 UTC
     - cron: "0 5 * * *"
