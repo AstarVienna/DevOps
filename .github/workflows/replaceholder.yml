@@ -55,14 +55,14 @@ jobs:
         shell: bash
         run: pipx install poetry==2.1.4
 
-      - name: Install dependencies
-        shell: bash
-        run: pip install packaging
-
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+
+      - name: Install dependencies
+        shell: bash
+        run: pip install packaging
 
       - name: Replace placeholders
         id: bobr
