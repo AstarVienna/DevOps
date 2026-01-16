@@ -46,10 +46,48 @@ jobs:
       stable: ${{ steps.bobr.outputs.STABLE }}
 
     steps:
+      - name: Write App private key to file
+        run: |
+          echo "${{ secrets.APP_PRIVATE_KEY }}" > private-key.pem
+
+      - name: Generate JWT
+        id: jwt
+        shell: bash
+        run: |
+          now=$(date +%s)
+          exp=$((now + 600))  # 10 minutes
+          header='{"alg":"RS256","typ":"JWT"}'
+          payload="{\"iat\":$now,\"exp\":$exp,\"iss\":${{ secrets.APP_ID }}}"
+
+          base64url() {
+            openssl base64 -e -A | tr '+/' '-_' | tr -d '='
+          }
+
+          jwt_header=$(echo -n "$header" | base64url)
+          jwt_payload=$(echo -n "$payload" | base64url)
+
+          jwt_unsigned="${jwt_header}.${jwt_payload}"
+          jwt_signature=$(echo -n "$jwt_unsigned" | openssl dgst -sha256 -sign private-key.pem | base64url)
+
+          echo "jwt_token=${jwt_unsigned}.${jwt_signature}" >> $GITHUB_OUTPUT
+
+      - name: Request Installation Access Token
+        id: auth
+        shell: bash
+        run: |
+          token=$(curl -s -X POST \
+            -H "Authorization: Bearer ${{ steps.jwt.outputs.jwt_token }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/app/installations/${{ secrets.APP_INSTALLATION_ID }}/access_tokens |
+            jq -r .token)
+
+          echo "token=$token" >> $GITHUB_OUTPUT
+
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           ref: ${{ inputs.branch }}
+          token: ${{ steps.auth.outputs.token }}
 
       - name: Install poetry
         shell: bash
@@ -130,8 +168,8 @@ jobs:
         env:
           STABLE: ${{ steps.bobr.outputs.STABLE }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "astarvienna-bot[bot]"
+          git config user.email "217837468+myciapp[bot]@users.noreply.github.com"
           git commit -am "Replaced next version placeholders with $STABLE"
           git push
           echo "Successfully committed and pushed placeholder replacement." >> $GITHUB_STEP_SUMMARY
