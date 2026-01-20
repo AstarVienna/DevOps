@@ -41,7 +41,7 @@ jobs:
 
       - name: Install poetry
         shell: bash
-        run: pipx install poetry==2.1.4
+        run: pipx install poetry==2.3.0
 
       - name: Set up Python
         uses: actions/setup-python@v6
