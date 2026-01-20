@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "astarsample"
-version = "0.4a2"
+version = "0.4a3"
 description = "Example project"
 readme = "README.md"
 license = "GPL-3.0-or-later"
