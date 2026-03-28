@@ -6,10 +6,11 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
     inputs:
-      poetry:
-        type: boolean
-        description: "Deprecated, will now always use Poetry."
+      python-versions:
         required: false
+        type: string
+        # IMPORTANT: When updating these, also update below!!
+        default: '["3.10", "3.14"]'
 
 jobs:
   run-tests:
@@ -20,7 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.14']
+        # IMPORTANT: When updating these, also update above!!
+        python-version: ${{ fromJSON(inputs.python-versions || '["3.10", "3.14"]') }}
         experimental: [false]
         # include:
         #   - os: ubuntu-latest
