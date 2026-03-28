@@ -13,11 +13,18 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
     inputs:
-      poetry:
-        type: boolean
-        description: "Deprecated, will now always use Poetry."
+      python-versions:
         required: false
-        default: true
+        type: string
+        default: "['3.10', '3.11', '3.12', '3.13', '3.14']"
+      python-min:
+        required: false
+        type: string
+        default: '3.10'
+      python-max:
+        required: false
+        type: string
+        default: '3.14'
 
 jobs:
   run-tests:
@@ -27,13 +34,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ${{ fromJSON(inputs.python-versions) }}
         experimental: [false]
         include:
           - os: macos-latest
-            python-version: '3.10'
+            python-version: ${{ inputs.python-min }}
           - os: macos-latest
-            python-version: '3.14'
+            python-version: ${{ inputs.python-max }}
         #   - os: ubuntu-latest
         #     python-version: '3.15'
         #     experimental: true
