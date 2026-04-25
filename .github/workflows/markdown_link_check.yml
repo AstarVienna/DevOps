@@ -10,6 +10,9 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
 
+  # Allow this workflow to be called from the GitHub UI.
+  workflow_dispatch:
+
 jobs:
   markdown-link-check:
     runs-on: ubuntu-22.04
@@ -26,6 +29,6 @@ jobs:
         # Generate default configuration file if it doesn't exist.
         # - github.com URL's can lead to rate limiting errors.
         # - stsci.edu URL's can lead to connection refused errors.
-        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\nignorePatterns:\n  - pattern: '^https://www.gnu.org/licenses.*$'\n  - pattern: '^https://jwst-docs.stsci.edu/$'\n" > .linkspector.yml ; fi
+        if [ ! -f .linkspector.yml ] ; then printf "dirs:\n  - ./\nignorePatterns:\n  - pattern: '^https://www.gnu.org/licenses.*$'\n  - pattern: '^https://jwst-docs.stsci.edu/.*$'\n" > .linkspector.yml ; fi
         # Run the check.
         linkspector check
