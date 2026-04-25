@@ -12,3 +12,10 @@ This quote highlights the goal of this repository:
 [arghwhat](https://news.ycombinator.com/item?id=36354464)
 
 > The problem with DevOps is not really how it is practiced, but how it is named. DevOps is a bucket that a bunch of things are thrown into, and everybody thinks the thing they threw in is DevOps with the others being mislabelled.
+
+## URL's to test the markdown linkchecker action
+
+These URL's have caused trouble with the markdown link checker, and are
+therefore included here:
+
+- https://jwst-docs.stsci.edu/
