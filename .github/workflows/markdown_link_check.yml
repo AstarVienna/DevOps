@@ -10,6 +10,9 @@ on:
   # Allow this workflow to be called from other repositories.
   workflow_call:
 
+  # Allow this workflow to be called from the GitHub UI.
+  workflow_dispatch:
+
 jobs:
   markdown-link-check:
     runs-on: ubuntu-22.04
