@@ -84,7 +84,7 @@ jobs:
           echo "token=$token" >> $GITHUB_OUTPUT
 
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.branch }}
           token: ${{ steps.auth.outputs.token }}
