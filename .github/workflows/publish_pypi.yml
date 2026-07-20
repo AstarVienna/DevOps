@@ -19,6 +19,16 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Verify tag matches package version
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKGVER=$(poetry version -s)
+          if [ "${TAG#v}" != "$PKGVER" ]; then
+            echo "::error::Release tag $TAG does not match package version $PKGVER at the tagged commit."
+            exit 1
+          fi
+
       - name: Create step summary
         run: echo "## Building $(poetry version)" >> $GITHUB_STEP_SUMMARY
 
@@ -45,7 +55,8 @@ jobs:
     name: Publish package to PyPI
     runs-on: ubuntu-latest
     needs: Build
-    if: needs.build.result == 'success'
+    # Internal pre-release tags (aN/bN/rcN) get built and attached to the GitHub release above, but are never published to PyPI.
+    if: ${{ needs.Build.result == 'success' && !github.event.release.prerelease }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -81,12 +92,5 @@ jobs:
           SUBURL="${PKGVER// //}"
           echo "https://pypi.org/project/$SUBURL/" >> $GITHUB_STEP_SUMMARY
 
-  Bump:
-    name: Bump to (next) dev version
-    needs: Publish
-    if: ${{ needs.publish.result == 'success' }}
-    uses: ./.github/workflows/bump.yml
-    secrets: inherit
-    with:
-      rule: prerelease
-      branch: main
+  # NOTE: The former trailing "Bump to (next) dev version" job has moved to prepare_release.yml, which bumps to the next dev version
+  # immediately after creating the draft release, so the release version string never lingers on main while the draft awaits review.
