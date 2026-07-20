@@ -1,0 +1,137 @@
+name: Prepare release
+
+# Performs the version-bump / draft-release / dev-bump dance:
+#   1. Bump the package version to the release version (given rule).
+#   2. Create a DRAFT GitHub release whose tag is pinned to the SHA of that bump commit.
+#      The tag itself is only created by GitHub when a human reviews the (auto-generated + manual) notes and publishes the draft, which then triggers the publish_pypi workflow as before.
+#   3. Immediately bump the version to the next dev version, so the release version string never lingers on the branch, even while the draft awaits review.
+
+# Works for both stable releases (rule: patch/minor/major) and internal pre-release tags (rule: preminor/prerelease/...).
+# Pre-release versions are automatically marked as "pre-release" on the GitHub release, which the publish workflow uses to skip the PyPI upload.
+# Also works for backport releases: dispatch the workflow from a maintenance branch (e.g. v2.x) with rule "patch" and set previous-tag to the last tag of that series so the generated notes compare against the right base.
+
+on:
+  workflow_call:
+    inputs:
+      rule:
+        type: string
+        description: Poetry version bump rule for the release version
+        required: true
+      notes:
+        type: string
+        description: >
+          Manual release notes section, shown above the auto-generated
+          notes. Can also be added/edited later in the draft release UI.
+        required: false
+        default: ""
+      tag-prefix:
+        type: string
+        description: Prefix for the git tag created from the version number
+        required: false
+        default: "v"
+      branch:
+        type: string
+        description: >
+          Branch (ref) to release from. Defaults to the ref the workflow
+          was dispatched on, so releasing from a maintenance branch (e.g.
+          v2.x) only requires selecting that branch in the Actions UI.
+        required: false
+        default: ${{ github.ref_name }}
+      previous-tag:
+        type: string
+        description: >
+          Tag to use as comparison base for the auto-generated release
+          notes. Leave empty to let GitHub choose automatically (fine for
+          regular releases from main). Set explicitly for backport
+          releases from maintenance branches, where releases are created
+          out of version order and GitHub may pick the wrong base (e.g.
+          set to "v2.1.0" when releasing 2.1.1 after 2.5.0 exists).
+        required: false
+        default: ""
+    outputs:
+      version:
+        description: The release version number.
+        value: ${{ jobs.BumpRelease.outputs.version }}
+      draft-url:
+        description: URL of the created draft release.
+        value: ${{ jobs.Draft.outputs.url }}
+
+jobs:
+  BumpRelease:
+    name: Bump to release version
+    uses: ./.github/workflows/bump.yml
+    secrets: inherit
+    with:
+      rule: ${{ inputs.rule }}
+      branch: ${{ inputs.branch }}
+
+  Draft:
+    name: Create draft release
+    runs-on: ubuntu-latest
+    needs: BumpRelease
+    permissions:
+      contents: write
+    outputs:
+      url: ${{ steps.draft.outputs.url }}
+
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install packaging
+        shell: bash
+        run: pip install packaging
+
+      - name: Determine release type
+        id: reltype
+        env:
+          VERSION: ${{ needs.BumpRelease.outputs.version }}
+        shell: python
+        run: |
+          import os, sys
+          from packaging.version import Version
+
+          version = Version(os.environ.get("VERSION"))
+
+          # Dev versions are never tagged or released.
+          if version.is_devrelease:
+              sys.exit(f"::error:: Refusing to create a release for dev "
+                       f"version {version!s}; check the bump rule.")
+
+          # Pre-releases (aN/bN/rcN) become internal-only tags: marked as pre-release on GitHub, skipped by the PyPI publish workflow.
+          with open(os.environ.get("GITHUB_OUTPUT"), "a") as output:
+              output.write(
+                  f"PRERELEASE={str(version.is_prerelease).lower()}\n")
+
+      - name: Create draft release
+        id: draft
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "${{ inputs.tag-prefix }}${{ needs.BumpRelease.outputs.version }}"
+          target_commitish: ${{ needs.BumpRelease.outputs.sha }}
+          draft: true
+          prerelease: ${{ steps.reltype.outputs.PRERELEASE == 'true' }}
+          generate_release_notes: true
+          previous_tag: ${{ inputs.previous-tag }}
+          body: ${{ inputs.notes }}
+
+      - name: Create step summary
+        env:
+          DRAFT_URL: ${{ steps.draft.outputs.url }}
+          VERSION: ${{ needs.BumpRelease.outputs.version }}
+          SHA: ${{ needs.BumpRelease.outputs.sha }}
+        run: |
+          echo "## Draft release for $VERSION created" >> $GITHUB_STEP_SUMMARY
+          echo "Tag will be created at \`$SHA\` upon publishing." >> $GITHUB_STEP_SUMMARY
+          echo "Review and publish here: $DRAFT_URL" >> $GITHUB_STEP_SUMMARY
+
+  BumpDev:
+    name: Bump to next dev version
+    needs: Draft
+    uses: ./.github/workflows/bump.yml
+    secrets: inherit
+    with:
+      rule: dev
+      branch: ${{ inputs.branch }}
