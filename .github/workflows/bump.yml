@@ -11,7 +11,8 @@ on:
         description: Version bump level
         required: true
         options:
-        - prerelease
+        - dev
+        # NOTE: bare "prerelease" is deliberately absent: under the always-on-devN scheme it crashes (from X.Y.Z.devN, poetry-core AssertionError) or skips a number (from X.Y.ZbN.devM -> bN+1 instead of bN). Use an explicit version instead.
         - "prerelease --next-phase"
         - prepatch
         - preminor
@@ -39,6 +40,12 @@ on:
       bumpmsg:
         description: Message created by the version bump.
         value: ${{ jobs.bump.outputs.bumpmsg }}
+      version:
+        description: New version number after the bump (empty on dry-run).
+        value: ${{ jobs.bump.outputs.version }}
+      sha:
+        description: SHA of the bump commit (empty on dry-run).
+        value: ${{ jobs.bump.outputs.sha }}
 
 jobs:
   bump:
@@ -48,6 +55,8 @@ jobs:
       contents: write
     outputs:
       bumpmsg: ${{ steps.bumping.outputs.BUMP_MSG }}
+      version: ${{ steps.commit.outputs.VERSION }}
+      sha: ${{ steps.commit.outputs.SHA }}
 
     steps:
       - name: Write App private key to file
@@ -102,12 +111,57 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Install packaging
+        if: inputs.rule == 'dev'
+        shell: bash
+        run: pip install packaging
+
+      - name: Compute next dev version
+        id: devver
+        if: inputs.rule == 'dev'
+        shell: python
+        run: |
+          import os, subprocess
+          from packaging.version import Version
+
+          # Get current version from poetry
+          current = Version(subprocess.run(
+              "poetry version -s",
+              shell=True,
+              check=True,
+              text=True,
+              capture_output=True,
+          ).stdout.strip())
+
+          if current.dev is not None:
+              # Already on a dev version (with or without pre-release
+              # segment): increment the dev counter, keep everything else.
+              pre = f"{current.pre[0]}{current.pre[1]}" if current.pre else ""
+              nxt = f"{current.base_version}{pre}.dev{current.dev + 1}"
+          elif current.pre is not None:
+              # Freshly tagged pre-release (e.g. 0.12.0b0): start dev cycle
+              # towards the next tag in the same phase (0.12.0b1.dev0).
+              nxt = (f"{current.base_version}"
+                     f"{current.pre[0]}{current.pre[1] + 1}.dev0")
+          else:
+              # Stable release: start dev cycle towards the next patch
+              # version. The actual release may still become minor/major,
+              # devN sorts below either, so guessing patch is always safe.
+              major, minor, patch = (*current.release, 0, 0)[:3]
+              nxt = f"{major}.{minor}.{patch + 1}.dev0"
+
+          with open(os.environ.get("GITHUB_OUTPUT"), "a") as output:
+              output.write(f"NEXT={nxt}\n")
+
       - name: Bump package Version using Poetry
         id: bumping
         env:
-          RULE: ${{ inputs.rule }}
+          RULE: ${{ inputs.rule == 'dev' && steps.devver.outputs.NEXT || inputs.rule }}
           DRY: ${{ inputs.dry-run && '--dry-run' || '' }}
-        run: echo "BUMP_MSG=$(poetry version $DRY $RULE)" >> $GITHUB_OUTPUT
+        # Assignment first, so a poetry failure fails this step (command substitution inside echo would swallow the exit code).
+        run: |
+          BUMP_MSG=$(poetry version $DRY $RULE)
+          echo "BUMP_MSG=$BUMP_MSG" >> $GITHUB_OUTPUT
 
       - name: Output debug msg
         if: inputs.dry-run
@@ -118,6 +172,7 @@ jobs:
           echo "Dry run only, no actual modification made." >> $GITHUB_STEP_SUMMARY
 
       - name: Commit changes
+        id: commit
         # could also use https://github.com/stefanzweifel/git-auto-commit-action instead
         if: ${{ ! inputs.dry-run }}
         env:
@@ -127,5 +182,7 @@ jobs:
           git config user.email "217837468+myciapp[bot]@users.noreply.github.com"
           git commit -am "$BUMP_MSG"
           git push
+          echo "VERSION=$(poetry version -s)" >> $GITHUB_OUTPUT
+          echo "SHA=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
           echo "## $BUMP_MSG" >> $GITHUB_STEP_SUMMARY
           echo "Successfully committed and pushed version bump." >> $GITHUB_STEP_SUMMARY
