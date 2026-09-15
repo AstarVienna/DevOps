@@ -10,7 +10,7 @@ on:
         required: false
         type: string
         # IMPORTANT: When updating these, also update below!!
-        default: '["3.10", "3.14"]'
+        default: '["3.12", "3.14"]'
 
 jobs:
   run-tests:
@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         # IMPORTANT: When updating these, also update above!!
-        python-version: ${{ fromJSON(inputs.python-versions || '["3.10", "3.14"]') }}
+        python-version: ${{ fromJSON(inputs.python-versions || '["3.12", "3.14"]') }}
         experimental: [false]
         # include:
         #   - os: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
 
       - name: Install poetry
         shell: bash
-        run: pipx install poetry==2.3.0
+        run: pipx install poetry==2.4.3
 
       - name: Set up Python
         uses: actions/setup-python@v7
