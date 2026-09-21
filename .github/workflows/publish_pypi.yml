@@ -12,7 +12,7 @@ jobs:
 
       - name: Install poetry
         shell: bash
-        run: pipx install poetry==2.3.0
+        run: pipx install poetry==2.5.1
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -55,15 +55,14 @@ jobs:
     name: Publish package to PyPI
     runs-on: ubuntu-latest
     needs: Build
-    # Internal pre-release tags (aN/bN/rcN) get built and attached to the GitHub release above, but are never published to PyPI.
-    if: ${{ needs.Build.result == 'success' && !github.event.release.prerelease }}
+    if: ${{ needs.Build.result == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
 
       - name: Install poetry
         shell: bash
-        run: pipx install poetry==2.3.0
+        run: pipx install poetry==2.5.1
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -91,6 +90,3 @@ jobs:
           PKGVER=$(poetry version)
           SUBURL="${PKGVER// //}"
           echo "https://pypi.org/project/$SUBURL/" >> $GITHUB_STEP_SUMMARY
-
-  # NOTE: The former trailing "Bump to (next) dev version" job has moved to prepare_release.yml, which bumps to the next dev version
-  # immediately after creating the draft release, so the release version string never lingers on main while the draft awaits review.
