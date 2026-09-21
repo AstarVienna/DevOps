@@ -107,7 +107,7 @@ jobs:
 
       - name: Create draft release
         id: draft
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: "${{ inputs.tag-prefix }}${{ needs.BumpRelease.outputs.version }}"
           target_commitish: ${{ needs.BumpRelease.outputs.sha }}
